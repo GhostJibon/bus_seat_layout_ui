@@ -2,7 +2,7 @@ import 'package:bus_sit_layout/config/di/dependency_injector.dart';
 import 'package:bus_sit_layout/config/navigation/app_route.dart';
 import 'package:bus_sit_layout/config/navigation/navigation_observer.dart';
 import 'package:bus_sit_layout/config/navigation/route_name.dart';
-import 'package:bus_sit_layout/config/di/state_management_provider.dart';
+import 'package:bus_sit_layout/config/providers/state_management_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';

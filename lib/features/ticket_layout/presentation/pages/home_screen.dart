@@ -17,55 +17,55 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _selectedApi = 'API 1';
+  late final ValueNotifier<String> _selectedApiVN;
 
   @override
   void initState() {
     super.initState();
-    context.read<SeatDataCubit>().getSeatData(
-          api: 1,
-        );
+    _selectedApiVN = ValueNotifier<String>('API 1');
+    context.read<SeatDataCubit>().getSeatData(api: 1);
   }
 
-  void _onApiChanged(String? value) {
-    if (value == null) return;
-    setState(() => _selectedApi = value);
-
-    if (value == 'API 1') {
-      context.read<SeatDataCubit>().getSeatData(
-            api: 1,
-          );
-    } else {
-      context.read<SeatDataCubit>().getSeatData(
-            api: 2,
-          );
-    }
+  @override
+  void dispose() {
+    _selectedApiVN.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Seat Layout", style: TextStyle(fontSize: 18.sp))),
+      appBar: AppBar(
+        title: Text("Seat Layout", style: TextStyle(fontSize: 18.sp)),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
             padding: EdgeInsets.all(16.w),
-            child: DropdownButtonFormField<String>(
-              value: _selectedApi,
-              decoration: InputDecoration(
-                labelText: 'Select API',
-                labelStyle: TextStyle(fontSize: 14.sp),
-                border: const OutlineInputBorder(),
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-              ),
-              items: const [
-                DropdownMenuItem(value: 'API 1', child: Text('API 1')),
-                DropdownMenuItem(value: 'API 2', child: Text('API 2')),
-              ],
-              onChanged: _onApiChanged,
+            child: ValueListenableBuilder<String>(
+              valueListenable: _selectedApiVN,
+              builder: (context, selectedApi, _) {
+                return DropdownButtonFormField<String>(
+                  value: selectedApi,
+                  decoration: InputDecoration(
+                    labelText: 'Select API',
+                    labelStyle: TextStyle(fontSize: 14.sp),
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 10.h,
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'API 1', child: Text('API 1')),
+                    DropdownMenuItem(value: 'API 2', child: Text('API 2')),
+                  ],
+                  onChanged: _onApiChanged,
+                );
+              },
             ),
           ),
           12.verticalSpace,
@@ -105,7 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: normalized.map((cellJson) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 4.w),
-                              child: CellBuilder(cellJson: cellJson, maxRowCount: maxCols,),
+                                child: CellBuilder(
+                                  cellJson: cellJson,
+                                  maxRowCount: maxCols,
+                                ),
                               );
                             }).toList(),
                           ),
@@ -130,6 +133,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _onApiChanged(String? value) {
+    if (value == null) return;
+
+    _selectedApiVN.value = value;
+
+    if (value == 'API 1') {
+      context.read<SeatDataCubit>().getSeatData(api: 1);
+    } else {
+      context.read<SeatDataCubit>().getSeatData(api: 2);
+    }
+  }
 
   int _rowWidth(dynamic row) {
     if (row is List) return row.length;
